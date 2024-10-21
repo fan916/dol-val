@@ -103,9 +103,10 @@ def main():
                 
                 # 计算并输出处理时间
                 elapsed_time = (end_time - start_time) * 1000  # 转换为毫秒
-                
+                print(f"time:{elapsed_time}ms")
                 #根据时间计算分数
                 score = calculate_score(elapsed_time)
+                print(f"score:{score}")
                 
                 # 将处理时间记录到日志文件
                 # log.write(f"Processed {filename} in {elapsed_time:.2f} ms score:{score}\n")

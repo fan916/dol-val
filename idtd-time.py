@@ -101,10 +101,11 @@ if __name__ == "__main__":
         
         # 计算并输出处理时间
         elapsed_time = (end_time - start_time) * 1000  # 转换为毫秒
+        print(f"time:{elapsed_time}ms")
 
         #根据时间计算分数
         score = calculate_score(elapsed_time)
-        
+        print(f"score:{score}")
         # 创建日志条目字典
         log_entry = {
             "filename": img_file,
