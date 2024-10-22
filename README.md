@@ -1,7 +1,11 @@
-acc.py可以进行两个任务的精度计算
+val.py进行时间和精度计算
+将算法模块替换第93行的process_image
+process_image函数：
+输入：单张图片 image
+返回：目标中心点 (centerX, centerY)
+eg.
+def process_image(image)
+    .....
+return (centerX, centerY)
 
-目前时间计算版本均基于base
-
-sot-time.py进行跟踪任务的时间计算
-
-idtd-time.py进行弱小目标检测任务的时间计算
+需要修改几个路径，代码中有注释
