@@ -88,6 +88,7 @@ for k = 1:length(predicted_files)
         end
         
         % 读取预测中心坐标
+        predicted_file = fullfile(center_folder, predicted_file_name); % 添加这一行以确保路径正确
         pred_coords = sscanf(fileread(predicted_file), '%f')';
         if length(pred_coords) < 2
             fprintf('Predicted file %s is invalid, skipping...\n', predicted_file);
