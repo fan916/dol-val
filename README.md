@@ -1,6 +1,6 @@
 # val.py进行时间和精度计算
 
-将算法模块替换第93行的process_image
+将算法模块替换第93行的process_image，算法核心不需要读取图片
 
 process_image函数：
 
