@@ -1,4 +1,4 @@
-#val.py进行时间和精度计算
+# val.py进行时间和精度计算
 
 将算法模块替换第93行的process_image
 
@@ -11,9 +11,7 @@ process_image函数：
 eg.
 
 def process_image(image)
-
-    .....
-    
+    .....    
 return (centerX, centerY)
 
 需要修改几个路径，代码中有注释
