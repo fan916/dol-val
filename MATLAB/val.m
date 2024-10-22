@@ -30,7 +30,7 @@ for k = 1:length(image_files)
 
             % 保存绘制框的中心坐标到txt文件
             if ~isempty(center)
-                center_file_path = fullfile(center_folder, [image_files(k).name(1:end-4), '.txt']);
+                center_file_path = fullfile(center_folder, [image_files(k).name(1:end-4), 'txt']);
                 fid = fopen(center_file_path, 'w');
                 fprintf(fid, '%.2f %.2f\n', center(1), center(2));
                 fclose(fid);
