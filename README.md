@@ -1,4 +1,4 @@
-val.py进行时间和精度计算
+#val.py进行时间和精度计算
 
 将算法模块替换第93行的process_image
 
