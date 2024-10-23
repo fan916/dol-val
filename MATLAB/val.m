@@ -1,9 +1,8 @@
-input_folder = 'E:\track-train\01'; % 测试图片文件夹
-center_folder = 'E:\track-label'; % 中心坐标结果保存文件夹
-log_file = 'E:\track-time-log.txt'; % 保存时间结果的日志文件路径
-gt_folder = 'E:\track-train\02';  % 真值标签的txt文件夹路径
-result_log = 'E:\track-acc-log.txt';  % 保存比较结果的日志文件路径
-
+input_folder = "E:\detect-train-1\01"; % 测试图片文件夹
+center_folder = 'E:\detect-label'; % 中心坐标结果保存文件夹
+log_file = 'E:\detect-time-log.txt'; % 保存时间结果的日志文件路径
+gt_folder = "E:\detect-train-1\02";  % 真值标签的txt文件夹路径
+result_log = 'E:\detect-acc-log.txt';  % 保存比较结果的日志文件路径
 
 if ~exist(center_folder, 'dir')
     mkdir(center_folder);
@@ -26,7 +25,7 @@ for k = 1:length(image_files)
             start_time = tic; % 记录开始时间
             
             % 算法调用
-            center = process_image(image); % 目标中心 (centerX, centerY)
+            center = DBC(image); % 目标中心 (centerX, centerY)
 
             % 保存绘制框的中心坐标到txt文件
             if ~isempty(center)
@@ -59,7 +58,7 @@ if total_images > 0
 
     % 在最后写入日志文件
     fid = fopen(log_file, 'w');
-    json_entries = jsonencode(log_entries);
+    json_entries = jsonencode(log_entries, 'PrettyPrint', true);
     fprintf(fid, '%s\n', json_entries);
     fclose(fid);
 else
@@ -76,7 +75,6 @@ for k = 1:length(predicted_files)
     predicted_file_name = strrep(predicted_file_name, '..', '.'); % 替换重复的点
     gt_file = fullfile(gt_folder, predicted_file_name);
 
-    disp(gt_file);
     
     % 检查真值标签文件是否存在
     if exist(gt_file, 'file')
@@ -121,7 +119,7 @@ if numel(log_entries_acc) > 0
 
     % 在最后写入日志文件
     fid = fopen(result_log, 'w');
-    json_entries_acc = jsonencode(log_entries_acc);
+    json_entries_acc = jsonencode(log_entries_acc, 'PrettyPrint', true);
     fprintf(fid, '%s\n', json_entries_acc);
     fclose(fid);
 else
