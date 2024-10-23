@@ -3,6 +3,7 @@ import numpy as np
 import os
 import time
 import json
+from idtd import process_image
 
 
 def calculate_time_score(time_in_ms):
@@ -61,11 +62,11 @@ def calculate_pixel_difference(pred_center, gt_center):
 
 
 def main():
-    input_folder = r"E:\track-train\01" # 测试图片文件夹
-    center_folder = r"E:\track-label" # 中心坐标结果保存文件夹
-    log_file = r"E:\track-time-log.txt" # 保存时间结果的日志文件路径
-    gt_folder = r"E:\track-train\02"  # 真值标签的txt文件夹路径
-    result_log =  r"E:\track-acc-log.txt"  # 保存比较结果的日志文件路径
+    input_folder = r"E:\detect-train-2\02\05\images" # 测试图片文件夹
+    center_folder = r"E:\detect-label" # 中心坐标结果保存文件夹
+    log_file = r"E:\detect-time-log.txt" # 保存时间结果的日志文件路径
+    gt_folder = r"E:\detect-train-2\02\05\txt"  # 真值标签的txt文件夹路径
+    result_log =  r"E:\detect-acc-log.txt"  # 保存比较结果的日志文件路径
     
     predicted_folder = center_folder 
     log_entries = []
@@ -162,7 +163,8 @@ def main():
                 #根据像素插值计算得分
                 score = calculate_acc_score(pixel_difference)
                 total_accuracy += score  # 累加精度得分
-                
+                total_images += 1
+
                 # 创建日志条目字典
                 log_entry = {
                     "filename": filename,
@@ -174,7 +176,7 @@ def main():
                 print(f"Ground truth file for {filename} not found!")
                 
     # 计算平均精度分数
-    average_accuracy = total_accuracy / len(log_entries_acc) if log_entries_acc else 0
+    average_accuracy = total_accuracy / total_images if total_images else 0
     print(f"Average accuracy score: {average_accuracy:.2f}")
 
     # 在最后写入日志文件
