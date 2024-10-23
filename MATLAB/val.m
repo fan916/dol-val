@@ -1,7 +1,7 @@
-input_folder = "E:\detect-train-1\01"; % 测试图片文件夹
+input_folder = "E:\detect-train-2\01\04\images"; % 测试图片文件夹
 center_folder = 'E:\detect-label'; % 中心坐标结果保存文件夹
 log_file = 'E:\detect-time-log.txt'; % 保存时间结果的日志文件路径
-gt_folder = "E:\detect-train-1\02";  % 真值标签的txt文件夹路径
+gt_folder = "E:\detect-train-2\01\04\txt";  % 真值标签的txt文件夹路径
 result_log = 'E:\detect-acc-log.txt';  % 保存比较结果的日志文件路径
 
 if ~exist(center_folder, 'dir')
@@ -104,6 +104,7 @@ for k = 1:length(predicted_files)
         % 根据像素差计算得分
         score = calculate_acc_score(pixel_difference);
         total_accuracy = total_accuracy + score;
+        total_images = total_images + 1;
         
         % 创建日志条目字典
         log_entries_acc(end+1) = struct('filename', predicted_files(k).name, 'pixel_difference', pixel_difference, 'score', score);
@@ -114,7 +115,7 @@ end
 
 % 计算平均精度分数
 if numel(log_entries_acc) > 0
-    average_accuracy = total_accuracy / numel(log_entries_acc);
+    average_accuracy = total_accuracy / total_images;
     fprintf('Average accuracy score: %.2f\n', average_accuracy);
 
     % 在最后写入日志文件
