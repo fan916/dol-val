@@ -143,7 +143,7 @@ def main():
                         else:
                             print(f"Ground truth file for {filename} not found!")
 
-        print(f"{filename}, time = {time_score}, acc = {acc_score}, score = {time_score * acc_score/10000}")
+        print(f"{filename}, time_score = {time_score}, acc_score = {acc_score}, score = {time_score * acc_score/10000}")
 
     # 在最后写入日志文件
     with open(result_log, "w") as log_file:
