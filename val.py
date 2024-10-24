@@ -3,7 +3,7 @@ import numpy as np
 import os
 import time
 import json
-from sot_fast import process_image
+from idtd_fast import process_image
 
 def calculate_time_score(time_in_ms):
     """根据处理时间计算得分"""
@@ -24,7 +24,11 @@ def calculate_acc_score(pixels):
 def calculate_center_from_gt(label_file):
     """读取真值标签文件并计算框的中心坐标"""
     with open(label_file, 'r') as f:
-        category, x, y, w, h = map(float, f.readline().strip().split())
+        line = f.readline().strip()
+        if not line:
+            raise ValueError(f"Ground truth file {label_file} is empty.")
+        
+        category, x, y, w, h = map(float, line.split())
         return x + w / 2, y + h / 2
 
 def calculate_pixel_difference(pred_center, gt_center):
@@ -32,10 +36,10 @@ def calculate_pixel_difference(pred_center, gt_center):
     return np.linalg.norm(np.array(pred_center) - np.array(gt_center))
 
 def main():
-    input_folder = r"E:\track-train\01" # 测试图片文件夹
-    gt_folder = r"E:\track-train\02" # 真值标签的txt文件夹路径
-    center_folder = r"E:\track-train\track-label" # 中心坐标结果保存文件夹
-    result_log = r"E:\track-train\track-log.txt" # 保存计算的日志文件路径
+    input_folder = r"E:\23\images" # 测试图片文件夹
+    gt_folder = r"E:\23\labels" # 真值标签的txt文件夹路径
+    center_folder = r"E:\23\idtd-label" # 中心坐标结果保存文件夹
+    result_log = r"E:\23\idtd-log.txt" # 保存计算的日志文件路径
 
     if not os.path.exists(center_folder):
         os.makedirs(center_folder)
@@ -64,7 +68,12 @@ def main():
 
                 gt_file = os.path.join(gt_folder, f"{os.path.splitext(filename)[0]}.txt")
                 if os.path.exists(gt_file):
-                    gt_center = calculate_center_from_gt(gt_file)
+                    try:
+                        gt_center = calculate_center_from_gt(gt_file)
+                    except ValueError as e:
+                        print(e)  # 输出错误信息，跳过该文件
+                        continue
+
                     pixel_difference = calculate_pixel_difference(center, gt_center)
                     acc_score = calculate_acc_score(pixel_difference)
 
