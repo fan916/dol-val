@@ -3,7 +3,7 @@ import numpy as np
 import os
 import time
 import json
-from idtd import process_image
+from sot_fast import process_image
 
 
 def calculate_time_score(time_in_ms):
@@ -62,18 +62,13 @@ def calculate_pixel_difference(pred_center, gt_center):
 
 
 def main():
-    input_folder = r"E:\detect-train-2\02\05\images" # 测试图片文件夹
-    center_folder = r"E:\detect-label" # 中心坐标结果保存文件夹
-    log_file = r"E:\detect-time-log.txt" # 保存时间结果的日志文件路径
-    gt_folder = r"E:\detect-train-2\02\05\txt"  # 真值标签的txt文件夹路径
-    result_log =  r"E:\detect-acc-log.txt"  # 保存比较结果的日志文件路径
+    input_folder = r"E:\track-train\01" # 测试图片文件夹
+    gt_folder = r"E:\track-train\02"  # 真值标签的txt文件夹路径
+    center_folder = r"E:\track-train\track-label" # 中心坐标结果保存文件夹
+    result_log =  r"E:\track-train\track-log.txt"  # 保存计算的日志文件路径
     
     predicted_folder = center_folder 
     log_entries = []
-    
-    total_time = 0
-    total_images = 0
-    total_accuracy = 0
 
     if not os.path.exists(center_folder):
         os.makedirs(center_folder)
@@ -105,83 +100,54 @@ def main():
                 
                 # 计算并输出处理时间
                 elapsed_time = (end_time - start_time) * 1000  # 转换为毫秒
-                total_time += elapsed_time
-                total_images += 1
-   
-                score = calculate_time_score(elapsed_time)
-                total_accuracy += score  # 累加精度得分
-
-                # log.write(f"Processed {filename} in {elapsed_time:.2f} ms score:{score}\n")
-                # 创建日志条目字典
-                log_entry = {
-                    "filename": filename,
-                    "time": elapsed_time,
-                    "score": score
-                }
-                log_entries.append(log_entry)
-
-    # 计算平均处理时间
-    average_time = total_time / total_images if total_images > 0 else 0
-    print(f"Average processing time: {average_time:.2f} ms")
-    # 计算平均时间分数
-    average_accuracy = total_accuracy / len(log_entries) if log_entries else 0
-    print(f"Average time score: {average_accuracy:.2f}")
-    
-    # 在最后写入日志文件
-    with open(log_file, "w") as log_file:
-        json.dump(log_entries, log_file, indent=4)
-        
-    # 创建一个列表来存储所有记录
-    log_entries_acc = []
-           
-    for filename in os.listdir(predicted_folder):
-        if filename.endswith('.txt'):
-            predicted_file = os.path.join(predicted_folder, filename)
-            gt_file = os.path.join(gt_folder, filename)
-
-            # 检查真值标签文件是否存在
-            if os.path.exists(gt_file):
-                # 读取真值标签文件
-                with open(gt_file, 'r') as f:
-                    gt_content = f.readline().strip()
+                time_score = calculate_time_score(elapsed_time)
                 
-                # 检查真值标签内容是否为空
-                if not gt_content:
-                    print(f"Ground truth file for {filename} is empty, skipping...")
-                    continue  # 跳过当前文件
+                for filename in os.listdir(predicted_folder):
+                    if filename.endswith('.txt'):
+                        predicted_file = os.path.join(predicted_folder, filename)
+                        gt_file = os.path.join(gt_folder, filename)
 
-                # 读取预测中心坐标
-                with open(predicted_file, 'r') as f:
-                    pred_x, pred_y = map(float, f.readline().strip().split())
-                
-                # 读取真值标签中心坐标
-                gt_center_x, gt_center_y = calculate_center_from_gt(gt_file)
-                
-                # 计算中心坐标的差值
-                pixel_difference = calculate_pixel_difference((pred_x, pred_y), (gt_center_x, gt_center_y))
-                
-                #根据像素插值计算得分
-                score = calculate_acc_score(pixel_difference)
-                total_accuracy += score  # 累加精度得分
-                total_images += 1
+                        # 检查真值标签文件是否存在
+                        if os.path.exists(gt_file):
+                            # 读取真值标签文件
+                            with open(gt_file, 'r') as f:
+                                gt_content = f.readline().strip()
+                            
+                            # 检查真值标签内容是否为空
+                            if not gt_content:
+                                print(f"Ground truth file for {filename} is empty, skipping...")
+                                continue  # 跳过当前文件
 
-                # 创建日志条目字典
-                log_entry = {
-                    "filename": filename,
-                    "pixel_difference": pixel_difference,
-                    "score": score
-                }
-                log_entries_acc.append(log_entry)
-            else:
-                print(f"Ground truth file for {filename} not found!")
-                
-    # 计算平均精度分数
-    average_accuracy = total_accuracy / total_images if total_images else 0
-    print(f"Average accuracy score: {average_accuracy:.2f}")
+                            # 读取预测中心坐标
+                            with open(predicted_file, 'r') as f:
+                                pred_x, pred_y = map(float, f.readline().strip().split())
+                            
+                            # 读取真值标签中心坐标
+                            gt_center_x, gt_center_y = calculate_center_from_gt(gt_file)
+                            
+                            # 计算中心坐标的差值
+                            pixel_difference = calculate_pixel_difference((pred_x, pred_y), (gt_center_x, gt_center_y))
+                            
+                            #根据像素插值计算得分
+                            acc_score = calculate_acc_score(pixel_difference)
+
+                            # 创建日志条目字典
+                            log_entry = {
+                                "filename": filename,
+                                "pixel_difference": pixel_difference,
+                                "acc_score": acc_score,
+                                "time_score": time_score,
+                                "score": time_score * acc_score /10000
+                            }
+                            log_entries.append(log_entry)
+                        else:
+                            print(f"Ground truth file for {filename} not found!")
+
+        print(f"{filename}, time = {time_score}, acc = {acc_score}, score = {time_score * acc_score/10000}")
 
     # 在最后写入日志文件
     with open(result_log, "w") as log_file:
-        json.dump(log_entries_acc, log_file, indent=4)
+        json.dump(log_entries, log_file, indent=4)
 
 if __name__ == "__main__":
     main()
