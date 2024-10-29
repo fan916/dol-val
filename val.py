@@ -36,15 +36,19 @@ def calculate_pixel_difference(pred_center, gt_center):
     return np.linalg.norm(np.array(pred_center) - np.array(gt_center))
 
 def main():
-    input_folder = r"E:\23\images" # 测试图片文件夹
-    gt_folder = r"E:\23\labels" # 真值标签的txt文件夹路径
-    center_folder = r"E:\23\idtd-label" # 中心坐标结果保存文件夹
-    result_log = r"E:\23\idtd-log.txt" # 保存计算的日志文件路径
+    input_folder = r"D:\data\23\images" # 测试图片文件夹
+    gt_folder = r"D:\data\23\labels" # 真值标签的txt文件夹路径
+    center_folder = r"D:\data\23\idtd-label" # 中心坐标结果保存文件夹
+    result_log = r"D:\data\23\idtd-log.txt" # 保存计算的日志文件路径
 
     if not os.path.exists(center_folder):
         os.makedirs(center_folder)
 
     log_entries = []
+    total_time_score = 0
+    total_acc_score = 0
+    total_score = 0
+    count = 0
 
     for filename in os.listdir(input_folder):
         if filename.lower().endswith(('.png', '.jpg', '.jpeg', '.bmp', '.tiff')):
@@ -85,11 +89,24 @@ def main():
                         "score": time_score * acc_score / 10000
                     }
                     log_entries.append(log_entry)
+                    # 累加分数
+                    total_time_score += time_score
+                    total_acc_score += acc_score
+                    total_score += log_entry["score"]
+                    count += 1
                     print(f"{filename}, time_score = {time_score}, acc_score = {acc_score}, score = {time_score * acc_score / 10000}")
                 else:
                     print(f"Ground truth file for {filename} not found!")
-            else:
-                print(f"No center detected for image: {filename}")
+    # 计算平均分
+    if count > 0:
+        avg_time_score = total_time_score / count
+        avg_acc_score = total_acc_score / count
+        avg_score = total_score / count
+        print(f"Average time_score: {avg_time_score:.2f}")
+        print(f"Average acc_score: {avg_acc_score:.2f}")
+        print(f"Average score: {avg_score:.2f}")
+    else:
+        print("No valid entries to calculate averages.")
 
     with open(result_log, "w") as log_file:
         json.dump(log_entries, log_file, indent=4)
